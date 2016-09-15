@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from flaskbe.models.main import User
 import oauthlib
-from flask import jsonify
+from flask import jsonify, request
 from flaskbe.models.oauth_provider import Client, Grant, Token
 from flaskbe.oauth_provider import oauth_provider
 from .. import db, oauth
+from datetime import datetime, timedelta
 
 
 @oauth.clientgetter
@@ -40,8 +41,6 @@ def load_token(access_token=None, refresh_token=None):
         return Token.query.filter_by(access_token=access_token).first()
     elif refresh_token:
         return Token.query.filter_by(refresh_token=refresh_token).first()
-
-from datetime import datetime, timedelta
 
 
 @oauth.tokensetter
@@ -80,7 +79,7 @@ def authorize(*args, **kwargs):
     return True
 
 
-@oauth_provider.route('/token')
+@oauth_provider.route('/token', methods=['POST'])
 @oauth.token_handler
 def access_token():
     return None
@@ -89,4 +88,8 @@ def access_token():
 @oauth_provider.route('/start', methods=['GET'])
 @oauth.require_oauth()
 def start():
-    return jsonify({'message': 'hello from oauth'})
+    user = request.oauth.user
+    return jsonify({
+        'message': 'hello from oauth',
+        'user email': user.email,
+    })

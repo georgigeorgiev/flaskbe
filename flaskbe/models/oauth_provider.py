@@ -32,7 +32,10 @@ class Client(db.Model):
 
     @property
     def default_redirect_uri(self):
-        return self.redirect_uris[0]
+        try:
+            return self.redirect_uris[0]
+        except IndexError:
+            return None
 
     @property
     def default_scopes(self):
